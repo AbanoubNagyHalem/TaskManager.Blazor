@@ -1,0 +1,298 @@
+@page "/tasks/create"
+
+@inject TaskApiClient TaskApiClient
+@inject AuthenticatedPageGuard PageGuard
+@inject ApiErrorMessageProvider ApiErrorMessageProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Create Task</PageTitle>
+
+
+<div class="container py-4">
+
+    <div class="row">
+
+        <div class="col-lg-7">
+
+            <div class="mb-4">
+
+                <h1>
+                    Create Task
+                </h1>
+
+                <p class="text-muted">
+                    Add a new task to your list.
+                </p>
+
+            </div>
+
+
+            <ErrorState Message="@errorMessage" />
+
+
+            @if (successMessage is not null)
+            {
+                <div class="alert alert-success">
+                    @successMessage
+                </div>
+            }
+
+
+            @if (isLoading)
+            {
+                <LoadingState
+                    Message="Loading form..." />
+            }
+            else
+            {
+                <div class="card shadow-sm">
+
+                    <div class="card-body p-4">
+
+                        <EditForm
+                            Model="@model"
+                            OnValidSubmit="HandleCreateAsync">
+
+                            <DataAnnotationsValidator />
+
+                            <ValidationSummary />
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Title
+                                </label>
+
+
+                                <InputText
+                                    class="form-control"
+                                    @bind-Value="model.Title" />
+
+
+                                <ValidationMessage
+                                    For="@(() => model.Title)" />
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Description
+                                </label>
+
+
+                                <InputTextArea
+                                    class="form-control"
+                                    rows="5"
+                                    @bind-Value="model.Description" />
+
+
+                                <ValidationMessage
+                                    For="@(() => model.Description)" />
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Due Date
+                                </label>
+
+
+                                <InputDate
+                                    class="form-control"
+                                    @bind-Value="model.DueDate" />
+
+                            </div>
+
+
+                            <div class="mb-4">
+
+                                <label class="form-label">
+                                    Priority
+                                </label>
+
+
+                                <InputSelect
+                                    class="form-select"
+                                    @bind-Value="model.Priority">
+
+                                    <option value="@TaskPriority.Low">
+                                        Low
+                                    </option>
+
+                                    <option value="@TaskPriority.Medium">
+                                        Medium
+                                    </option>
+
+                                    <option value="@TaskPriority.High">
+                                        High
+                                    </option>
+
+                                </InputSelect>
+
+                            </div>
+
+
+                            <div class="d-flex gap-2">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-dark"
+                                    disabled="@isSubmitting">
+
+                                    @if (isSubmitting)
+                                    {
+                                        <span
+                                            class="spinner-border spinner-border-sm me-2">
+                                        </span>
+
+                                        <span>
+                                            Creating...
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Create Task
+                                        </span>
+                                    }
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    disabled="@isSubmitting"
+                                    @onclick="GoBack">
+
+                                    Cancel
+
+                                </button>
+
+                            </div>
+
+                        </EditForm>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    private CreateTaskRequest model =
+        new();
+
+
+    private bool isLoading =
+        true;
+
+
+    private bool isSubmitting;
+
+
+    private string? errorMessage;
+
+
+    private string? successMessage;
+
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+
+        bool allowed =
+            await PageGuard
+                .EnsureAuthenticatedAsync();
+
+
+        if (!allowed)
+        {
+            return;
+        }
+
+
+        isLoading =
+            false;
+
+
+        StateHasChanged();
+    }
+
+
+    private async Task HandleCreateAsync()
+    {
+        try
+        {
+            isSubmitting =
+                true;
+
+
+            errorMessage =
+                null;
+
+
+            successMessage =
+                null;
+
+
+            HttpResponseMessage response =
+                await TaskApiClient.CreateAsync(
+                    model);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage =
+                    "Task created successfully.";
+
+
+                model =
+                    new CreateTaskRequest();
+
+
+                return;
+            }
+
+
+            errorMessage =
+                await ApiErrorMessageProvider
+                    .GetMessageAsync(
+                        response,
+                        $"Could not create task. Status: {(int)response.StatusCode}");
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage =
+                "Could not connect to the API.";
+        }
+        finally
+        {
+            isSubmitting =
+                false;
+        }
+    }
+
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo(
+            "/tasks");
+    }
+}

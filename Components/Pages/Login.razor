@@ -1,0 +1,190 @@
+@page "/login"
+
+@inject AuthApiClient AuthApiClient
+@inject AuthStateService AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Login</PageTitle>
+
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h1 class="h3 mb-3">
+                        Login
+                    </h1>
+
+
+                    <p class="text-muted mb-4">
+                        Sign in to manage your tasks.
+                    </p>
+
+
+                    @if (!string.IsNullOrWhiteSpace(
+                            errorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @errorMessage
+                        </div>
+                    }
+
+
+                    <EditForm
+                        Model="@model"
+                        OnValidSubmit="HandleLoginAsync">
+
+                        <DataAnnotationsValidator />
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+
+                            <InputText
+                                class="form-control"
+                                @bind-Value="model.Email"
+                                placeholder="you@example.com" />
+
+
+                            <ValidationMessage
+                                For="@(() => model.Email)" />
+
+                        </div>
+
+
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                Password
+                            </label>
+
+
+                            <InputText
+                                type="password"
+                                class="form-control"
+                                @bind-Value="model.Password"
+                                placeholder="Enter your password" />
+
+
+                            <ValidationMessage
+                                For="@(() => model.Password)" />
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-dark w-100"
+                            disabled="@isSubmitting">
+
+                            @if (isSubmitting)
+                            {
+                                <span
+                                    class="spinner-border spinner-border-sm me-2">
+                                </span>
+
+                                <span>
+                                    Signing in...
+                                </span>
+                            }
+                            else
+                            {
+                                <span>
+                                    Login
+                                </span>
+                            }
+
+                        </button>
+
+                    </EditForm>
+
+
+                    <div class="text-center mt-4">
+
+                        <span>
+                            Don't have an account?
+                        </span>
+
+                        <a href="/register">
+                            Register
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    private readonly LoginRequest model =
+        new();
+
+
+    private bool isSubmitting;
+
+
+    private string? errorMessage;
+
+
+    private async Task HandleLoginAsync()
+    {
+        try
+        {
+            isSubmitting =
+                true;
+
+
+            errorMessage =
+                null;
+
+
+            AuthResponse? response =
+                await AuthApiClient.LoginAsync(
+                    model);
+
+
+            if (response is null)
+            {
+                errorMessage =
+                    "Invalid email or password.";
+
+                return;
+            }
+
+
+            await AuthState.SetUserAsync(
+                response);
+
+
+            Navigation.NavigateTo(
+                "/");
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage =
+                "Could not connect to the API.";
+        }
+        finally
+        {
+            isSubmitting =
+                false;
+        }
+    }
+}

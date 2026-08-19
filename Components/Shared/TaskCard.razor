@@ -1,0 +1,154 @@
+<div class="card h-100 shadow-sm">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between gap-3 mb-3">
+
+            <div>
+
+                <span class="badge text-bg-secondary mb-2">
+                    @Priority
+                </span>
+
+
+                <h3 class="h5 mb-1">
+                    @Title
+                </h3>
+
+            </div>
+
+
+            <span class="@GetStatusClass()">
+                @GetStatusText()
+            </span>
+
+        </div>
+
+
+        @if (!string.IsNullOrWhiteSpace(
+                Description))
+        {
+            <p class="text-muted">
+                @Description
+            </p>
+        }
+
+
+        <div class="small text-muted mb-3">
+
+            @if (DueDate.HasValue)
+            {
+                <div>
+                    Due:
+                    @DueDate.Value.ToString(
+                        "dd MMM yyyy")
+                </div>
+            }
+            else
+            {
+                <div>
+                    No due date
+                </div>
+            }
+
+        </div>
+
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a
+                class="btn btn-sm btn-outline-warning"
+                href="@($"/tasks/edit/{Id}")">
+
+                Edit
+
+            </a>
+
+
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                @onclick="HandleDeleteAsync">
+
+                Delete
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+
+    [Parameter]
+    public string Title { get; set; } =
+        "";
+
+
+    [Parameter]
+    public string? Description { get; set; }
+
+
+    [Parameter]
+    public DateTime? DueDate { get; set; }
+
+
+    [Parameter]
+    public TaskPriority Priority { get; set; }
+
+
+    [Parameter]
+    public TaskItemStatus Status { get; set; }
+
+
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+
+
+    private Task HandleDeleteAsync()
+    {
+        return OnDelete.InvokeAsync(
+            Id);
+    }
+
+
+    private string GetStatusText()
+    {
+        return Status switch
+        {
+            TaskItemStatus.Pending =>
+                "Pending",
+
+            TaskItemStatus.InProgress =>
+                "In Progress",
+
+            TaskItemStatus.Completed =>
+                "Completed",
+
+            _ =>
+                Status.ToString()
+        };
+    }
+
+
+    private string GetStatusClass()
+    {
+        return Status switch
+        {
+            TaskItemStatus.Completed =>
+                "badge text-bg-success",
+
+            TaskItemStatus.InProgress =>
+                "badge text-bg-warning",
+
+            _ =>
+                "badge text-bg-secondary"
+        };
+    }
+}

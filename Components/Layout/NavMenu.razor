@@ -1,0 +1,126 @@
+﻿@implements IDisposable
+
+@inject AuthStateService AuthState
+@inject NavigationManager Navigation
+
+
+<div class="navbar navbar-dark bg-dark px-3">
+
+    <a class="navbar-brand" href="/">
+
+        ✅ Task Manager
+
+    </a>
+
+
+    <div class="d-flex align-items-center gap-3">
+
+        @if (isLoaded)
+        {
+            @if (AuthState.IsAuthenticated)
+            {
+                <NavLink class="text-white text-decoration-none" href="" Match="NavLinkMatch.All">
+
+                    Dashboard
+
+                </NavLink>
+
+
+                <NavLink class="text-white text-decoration-none" href="tasks">
+
+                    My Tasks
+
+                </NavLink>
+
+
+                <NavLink class="text-white text-decoration-none" href="tasks/create">
+
+                    Add Task
+
+                </NavLink>
+
+
+                <span class="text-white-50">
+                    @AuthState.Name
+                </span>
+
+
+                <button type="button" class="btn btn-sm btn-outline-light" @onclick="LogoutAsync">
+
+                    Logout
+
+                </button>
+            }
+            else
+            {
+                <NavLink class="text-white text-decoration-none" href="login">
+
+                    Login
+
+                </NavLink>
+
+
+                <NavLink class="text-white text-decoration-none" href="register">
+
+                    Register
+
+                </NavLink>
+            }
+        }
+
+    </div>
+
+</div>
+
+
+@code {
+    private bool isLoaded;
+
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+
+        AuthState.OnChange +=
+            HandleAuthStateChanged;
+
+
+        await AuthState.LoadUserAsync();
+
+
+        isLoaded =
+            true;
+
+
+        StateHasChanged();
+    }
+
+
+    private async Task LogoutAsync()
+    {
+        await AuthState.LogoutAsync();
+
+
+        Navigation.NavigateTo(
+            "/login");
+    }
+
+
+    private void HandleAuthStateChanged()
+    {
+        InvokeAsync(
+            StateHasChanged);
+    }
+
+
+    public void Dispose()
+    {
+        AuthState.OnChange -=
+            HandleAuthStateChanged;
+    }
+}

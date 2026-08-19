@@ -1,0 +1,394 @@
+@page "/tasks/edit/{Id:int}"
+
+@inject TaskApiClient TaskApiClient
+@inject AuthenticatedPageGuard PageGuard
+@inject ApiErrorMessageProvider ApiErrorMessageProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Task</PageTitle>
+
+
+<div class="container py-4">
+
+    <div class="row">
+
+        <div class="col-lg-7">
+
+            <div class="mb-4">
+
+                <h1>
+                    Edit Task
+                </h1>
+
+                <p class="text-muted">
+                    Update task information.
+                </p>
+
+            </div>
+
+
+            <ErrorState Message="@errorMessage" />
+
+
+            @if (successMessage is not null)
+            {
+                <div class="alert alert-success">
+                    @successMessage
+                </div>
+            }
+
+
+            @if (isLoading)
+            {
+                <LoadingState
+                    Message="Loading task..." />
+            }
+            else if (notFound)
+            {
+                <div class="alert alert-warning">
+
+                    Task not found.
+
+                    <button
+                        class="btn btn-sm btn-outline-secondary ms-3"
+                        @onclick="GoBack">
+
+                        Back
+
+                    </button>
+
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm">
+
+                    <div class="card-body p-4">
+
+                        <EditForm
+                            Model="@model"
+                            OnValidSubmit="HandleUpdateAsync">
+
+                            <DataAnnotationsValidator />
+
+                            <ValidationSummary />
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Title
+                                </label>
+
+
+                                <InputText
+                                    class="form-control"
+                                    @bind-Value="model.Title" />
+
+
+                                <ValidationMessage
+                                    For="@(() => model.Title)" />
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Description
+                                </label>
+
+
+                                <InputTextArea
+                                    class="form-control"
+                                    rows="5"
+                                    @bind-Value="model.Description" />
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Due Date
+                                </label>
+
+
+                                <InputDate
+                                    class="form-control"
+                                    @bind-Value="model.DueDate" />
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Priority
+                                </label>
+
+
+                                <InputSelect
+                                    class="form-select"
+                                    @bind-Value="model.Priority">
+
+                                    <option value="@TaskPriority.Low">
+                                        Low
+                                    </option>
+
+                                    <option value="@TaskPriority.Medium">
+                                        Medium
+                                    </option>
+
+                                    <option value="@TaskPriority.High">
+                                        High
+                                    </option>
+
+                                </InputSelect>
+
+                            </div>
+
+
+                            <div class="mb-4">
+
+                                <label class="form-label">
+                                    Status
+                                </label>
+
+
+                                <InputSelect
+                                    class="form-select"
+                                    @bind-Value="model.Status">
+
+                                    <option value="@TaskItemStatus.Pending">
+                                        Pending
+                                    </option>
+
+                                    <option value="@TaskItemStatus.InProgress">
+                                        In Progress
+                                    </option>
+
+                                    <option value="@TaskItemStatus.Completed">
+                                        Completed
+                                    </option>
+
+                                </InputSelect>
+
+                            </div>
+
+
+                            <div class="d-flex gap-2">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-dark"
+                                    disabled="@isSubmitting">
+
+                                    @if (isSubmitting)
+                                    {
+                                        <span
+                                            class="spinner-border spinner-border-sm me-2">
+                                        </span>
+
+                                        <span>
+                                            Saving...
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Save Changes
+                                        </span>
+                                    }
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    disabled="@isSubmitting"
+                                    @onclick="GoBack">
+
+                                    Cancel
+
+                                </button>
+
+                            </div>
+
+                        </EditForm>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+
+    private UpdateTaskRequest model =
+        new();
+
+
+    private bool isLoading =
+        true;
+
+
+    private bool isSubmitting;
+
+
+    private bool notFound;
+
+
+    private string? errorMessage;
+
+
+    private string? successMessage;
+
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+
+        bool allowed =
+            await PageGuard
+                .EnsureAuthenticatedAsync();
+
+
+        if (!allowed)
+        {
+            return;
+        }
+
+
+        try
+        {
+            TaskResponse? task =
+                await TaskApiClient.GetByIdAsync(
+                    Id);
+
+
+            if (task is null)
+            {
+                notFound =
+                    true;
+
+                return;
+            }
+
+
+            model =
+                new UpdateTaskRequest
+                {
+                    Title =
+                        task.Title,
+
+                    Description =
+                        task.Description,
+
+                    DueDate =
+                        task.DueDate,
+
+                    Priority =
+                        task.Priority,
+
+                    Status =
+                        task.Status
+                };
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage =
+                "Could not load task.";
+        }
+        finally
+        {
+            isLoading =
+                false;
+
+
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task HandleUpdateAsync()
+    {
+        try
+        {
+            isSubmitting =
+                true;
+
+
+            errorMessage =
+                null;
+
+
+            successMessage =
+                null;
+
+
+            HttpResponseMessage response =
+                await TaskApiClient.UpdateAsync(
+                    Id,
+                    model);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage =
+                    "Task updated successfully.";
+
+                return;
+            }
+
+
+            if (response.StatusCode ==
+                System.Net.HttpStatusCode.NotFound)
+            {
+                notFound =
+                    true;
+
+                return;
+            }
+
+
+            errorMessage =
+                await ApiErrorMessageProvider
+                    .GetMessageAsync(
+                        response,
+                        $"Could not update task. Status: {(int)response.StatusCode}");
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage =
+                "Could not connect to the API.";
+        }
+        finally
+        {
+            isSubmitting =
+                false;
+        }
+    }
+
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo(
+            "/tasks");
+    }
+}

@@ -1,0 +1,261 @@
+﻿@page "/"
+
+@inject AuthStateService AuthState
+@inject TaskApiClient TaskApiClient
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard</PageTitle>
+
+
+<div class="container py-4">
+
+  @if (!isLoaded)
+  {
+    <LoadingState Message="Loading dashboard..." />
+  }
+  else if (!AuthState.IsAuthenticated)
+  {
+    <div class="py-5 text-center">
+
+      <div class="mb-4">
+
+        <div class="display-4 mb-3">
+          ✅
+        </div>
+
+
+        <h1>
+          Task Manager
+        </h1>
+
+
+        <p class="lead text-muted">
+          Organize your tasks and stay productive.
+        </p>
+
+      </div>
+
+
+      <a href="/login" class="btn btn-dark me-2">
+
+        Login
+
+      </a>
+
+
+      <a href="/register" class="btn btn-outline-secondary">
+
+        Register
+
+      </a>
+
+    </div>
+  }
+  else
+  {
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+
+      <div>
+
+        <h1 class="mb-1">
+          Dashboard
+        </h1>
+
+
+        <p class="text-muted mb-0">
+
+          Welcome back,
+
+          <strong>
+            @AuthState.Name
+          </strong>.
+
+        </p>
+
+      </div>
+
+
+      <a href="/tasks/create" class="btn btn-dark">
+
+        + Add Task
+
+      </a>
+
+    </div>
+
+
+    <ErrorState Message="@errorMessage" />
+
+
+    @if (isDashboardLoading)
+    {
+      <LoadingState Message="Loading task statistics..." />
+    }
+    else if (dashboard is not null)
+    {
+      <div class="row g-3 mb-4">
+
+        <div class="col-md-6 col-xl-4">
+
+          <StatCard Icon="📋" Label="Total Tasks" Value="@dashboard.TotalTasks" />
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-4">
+
+          <StatCard Icon="⏳" Label="Pending" Value="@dashboard.PendingTasks" />
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-4">
+
+          <StatCard Icon="🚧" Label="In Progress" Value="@dashboard.InProgressTasks" />
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-4">
+
+          <StatCard Icon="✅" Label="Completed" Value="@dashboard.CompletedTasks" />
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-4">
+
+          <StatCard Icon="🔥" Label="High Priority" Value="@dashboard.HighPriorityTasks" />
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-4">
+
+          <StatCard Icon="⚠️" Label="Overdue" Value="@dashboard.OverdueTasks" />
+
+        </div>
+
+      </div>
+
+
+      <div class="card shadow-sm">
+
+        <div class="card-body p-4">
+
+          <h2 class="h5 mb-3">
+            Quick Actions
+          </h2>
+
+
+          <div class="d-flex gap-2 flex-wrap">
+
+            <a href="/tasks" class="btn btn-dark">
+
+              View My Tasks
+
+            </a>
+
+
+            <a href="/tasks/create" class="btn btn-outline-primary">
+
+              Create Task
+
+            </a>
+
+
+            <button type="button" class="btn btn-outline-danger" @onclick="LogoutAsync">
+
+              Logout
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    }
+
+  }
+
+</div>
+
+
+@code {
+  private bool isLoaded;
+
+
+  private bool isDashboardLoading;
+
+
+  private string? errorMessage;
+
+
+  private TaskDashboardResponse? dashboard;
+
+
+  protected override async Task OnAfterRenderAsync(
+      bool firstRender)
+  {
+    if (!firstRender)
+    {
+      return;
+    }
+
+
+    await AuthState.LoadUserAsync();
+
+
+    isLoaded =
+        true;
+
+
+    if (AuthState.IsAuthenticated)
+    {
+      await LoadDashboardAsync();
+    }
+
+
+    StateHasChanged();
+  }
+
+
+  private async Task LoadDashboardAsync()
+  {
+    try
+    {
+      isDashboardLoading =
+          true;
+
+
+      errorMessage =
+          null;
+
+
+      dashboard =
+          await TaskApiClient
+              .GetDashboardAsync();
+    }
+    catch (HttpRequestException)
+    {
+      errorMessage =
+          "Could not load dashboard data.";
+    }
+    finally
+    {
+      isDashboardLoading =
+          false;
+    }
+  }
+
+
+  private async Task LogoutAsync()
+  {
+    await AuthState.LogoutAsync();
+
+
+    Navigation.NavigateTo(
+        "/login");
+  }
+}

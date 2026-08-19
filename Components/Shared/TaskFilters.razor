@@ -1,0 +1,321 @@
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-lg-4">
+
+                <label class="form-label">
+                    Search
+                </label>
+
+
+                <input
+                    class="form-control"
+                    placeholder="Search tasks..."
+                    value="@Search"
+                    @oninput="HandleSearchChanged" />
+
+            </div>
+
+
+            <div class="col-lg-2">
+
+                <label class="form-label">
+                    Status
+                </label>
+
+
+                <select
+                    class="form-select"
+                    value="@Status"
+                    @onchange="HandleStatusChanged">
+
+                    <option value="">
+                        All
+                    </option>
+
+                    <option value="@TaskItemStatus.Pending">
+                        Pending
+                    </option>
+
+                    <option value="@TaskItemStatus.InProgress">
+                        In Progress
+                    </option>
+
+                    <option value="@TaskItemStatus.Completed">
+                        Completed
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="col-lg-2">
+
+                <label class="form-label">
+                    Priority
+                </label>
+
+
+                <select
+                    class="form-select"
+                    value="@Priority"
+                    @onchange="HandlePriorityChanged">
+
+                    <option value="">
+                        All
+                    </option>
+
+                    <option value="@TaskPriority.Low">
+                        Low
+                    </option>
+
+                    <option value="@TaskPriority.Medium">
+                        Medium
+                    </option>
+
+                    <option value="@TaskPriority.High">
+                        High
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="col-lg-2">
+
+                <label class="form-label">
+                    Sort By
+                </label>
+
+
+                <select
+                    class="form-select"
+                    value="@SortBy"
+                    @onchange="HandleSortByChanged">
+
+                    <option value="">
+                        Default
+                    </option>
+
+                    <option value="title">
+                        Title
+                    </option>
+
+                    <option value="dueDate">
+                        Due Date
+                    </option>
+
+                    <option value="priority">
+                        Priority
+                    </option>
+
+                    <option value="status">
+                        Status
+                    </option>
+
+                    <option value="createdAt">
+                        Created
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="col-lg-2">
+
+                <label class="form-label">
+                    Direction
+                </label>
+
+
+                <select
+                    class="form-select"
+                    value="@SortDirection"
+                    @onchange="HandleDirectionChanged">
+
+                    <option value="asc">
+                        Ascending
+                    </option>
+
+                    <option value="desc">
+                        Descending
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="mt-3">
+
+            <button
+                type="button"
+                class="btn btn-dark"
+                @onclick="ApplyAsync">
+
+                Apply Filters
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string? Search { get; set; }
+
+
+    [Parameter]
+    public TaskItemStatus? Status { get; set; }
+
+
+    [Parameter]
+    public TaskPriority? Priority { get; set; }
+
+
+    [Parameter]
+    public string? SortBy { get; set; }
+
+
+    [Parameter]
+    public string SortDirection { get; set; } =
+        "asc";
+
+
+    [Parameter]
+    public EventCallback<string?>
+        SearchChanged { get; set; }
+
+
+    [Parameter]
+    public EventCallback<TaskItemStatus?>
+        StatusChanged { get; set; }
+
+
+    [Parameter]
+    public EventCallback<TaskPriority?>
+        PriorityChanged { get; set; }
+
+
+    [Parameter]
+    public EventCallback<string?>
+        SortByChanged { get; set; }
+
+
+    [Parameter]
+    public EventCallback<string>
+        SortDirectionChanged { get; set; }
+
+
+    [Parameter]
+    public EventCallback
+        OnApply { get; set; }
+
+
+    private Task HandleSearchChanged(
+        ChangeEventArgs args)
+    {
+        Search =
+            args.Value?.ToString();
+
+
+        return SearchChanged.InvokeAsync(
+            Search);
+    }
+
+
+    private Task HandleStatusChanged(
+        ChangeEventArgs args)
+    {
+        string? value =
+            args.Value?.ToString();
+
+
+        if (Enum.TryParse(
+                value,
+                out TaskItemStatus status))
+        {
+            Status =
+                status;
+        }
+        else
+        {
+            Status =
+                null;
+        }
+
+
+        return StatusChanged.InvokeAsync(
+            Status);
+    }
+
+
+    private Task HandlePriorityChanged(
+        ChangeEventArgs args)
+    {
+        string? value =
+            args.Value?.ToString();
+
+
+        if (Enum.TryParse(
+                value,
+                out TaskPriority priority))
+        {
+            Priority =
+                priority;
+        }
+        else
+        {
+            Priority =
+                null;
+        }
+
+
+        return PriorityChanged.InvokeAsync(
+            Priority);
+    }
+
+
+    private Task HandleSortByChanged(
+        ChangeEventArgs args)
+    {
+        SortBy =
+            args.Value?.ToString();
+
+
+        return SortByChanged.InvokeAsync(
+            SortBy);
+    }
+
+
+    private Task HandleDirectionChanged(
+        ChangeEventArgs args)
+    {
+        SortDirection =
+            args.Value?.ToString()
+            ?? "asc";
+
+
+        return SortDirectionChanged
+            .InvokeAsync(
+                SortDirection);
+    }
+
+
+    private Task ApplyAsync()
+    {
+        return OnApply.InvokeAsync();
+    }
+}
