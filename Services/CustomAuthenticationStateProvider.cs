@@ -6,38 +6,38 @@ namespace TaskManager.Blazor.Services;
 public class CustomAuthenticationStateProvider
     : AuthenticationStateProvider
 {
-  private readonly AuthStateService
-      _authState;
+    private readonly AuthStateService
+        _authState;
 
 
-  public CustomAuthenticationStateProvider(
-      AuthStateService authState)
-  {
-    _authState =
-        authState;
-
-
-    _authState.OnChange +=
-        HandleAuthStateChanged;
-  }
-
-
-  public override Task<AuthenticationState>
-      GetAuthenticationStateAsync()
-  {
-    ClaimsIdentity identity;
-
-
-    if (!_authState.IsAuthenticated)
+    public CustomAuthenticationStateProvider(
+        AuthStateService authState)
     {
-      identity =
-          new ClaimsIdentity();
+        _authState =
+            authState;
+
+
+        _authState.OnChange +=
+            HandleAuthStateChanged;
     }
-    else
+
+
+    public override Task<AuthenticationState>
+        GetAuthenticationStateAsync()
     {
-      List<Claim> claims =
-      [
-          new Claim(
+        ClaimsIdentity identity;
+
+
+        if (!_authState.IsAuthenticated)
+        {
+            identity =
+                new ClaimsIdentity();
+        }
+        else
+        {
+            List<Claim> claims =
+            [
+                new Claim(
                     ClaimTypes.NameIdentifier,
                     _authState.UserId?.ToString()
                         ?? ""),
@@ -56,35 +56,35 @@ public class CustomAuthenticationStateProvider
                     ClaimTypes.Role,
                     _authState.Role
                         ?? "")
-      ];
+            ];
 
 
-      identity =
-          new ClaimsIdentity(
-              claims,
-              authenticationType:
-                  "jwt");
+            identity =
+                new ClaimsIdentity(
+                    claims,
+                    authenticationType:
+                        "jwt");
+        }
+
+
+        ClaimsPrincipal user =
+            new(
+                identity);
+
+
+        AuthenticationState state =
+            new(
+                user);
+
+
+        return Task.FromResult(
+            state);
     }
 
 
-    ClaimsPrincipal user =
-        new(
-            identity);
-
-
-    AuthenticationState state =
-        new(
-            user);
-
-
-    return Task.FromResult(
-        state);
-  }
-
-
-  private void HandleAuthStateChanged()
-  {
-    NotifyAuthenticationStateChanged(
-        GetAuthenticationStateAsync());
-  }
+    private void HandleAuthStateChanged()
+    {
+        NotifyAuthenticationStateChanged(
+            GetAuthenticationStateAsync());
+    }
 }

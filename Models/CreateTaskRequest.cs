@@ -4,27 +4,27 @@ namespace TaskManager.Blazor.Models;
 
 public class CreateTaskRequest
 {
-  [Required(
-      ErrorMessage = "Title is required.")]
-  [StringLength(
-      150,
-      MinimumLength = 3,
-      ErrorMessage =
-          "Title must be between 3 and 150 characters.")]
-  public string Title { get; set; } =
-      "";
+    [Required(
+        ErrorMessage = "Title is required.")]
+    [StringLength(
+        150,
+        MinimumLength = 3,
+        ErrorMessage =
+            "Title must be between 3 and 150 characters.")]
+    public string Title { get; set; } =
+        "";
 
 
-  [StringLength(
-      1000,
-      ErrorMessage =
-          "Description cannot exceed 1000 characters.")]
-  public string? Description { get; set; }
+    [StringLength(
+        1000,
+        ErrorMessage =
+            "Description cannot exceed 1000 characters.")]
+    public string? Description { get; set; }
 
 
-  public DateTime? DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
 
-  public TaskPriority Priority { get; set; } =
-      TaskPriority.Medium;
+    public TaskPriority Priority { get; set; } =
+        TaskPriority.Medium;
 }

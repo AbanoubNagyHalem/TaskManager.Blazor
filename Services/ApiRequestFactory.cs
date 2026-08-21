@@ -4,48 +4,48 @@ namespace TaskManager.Blazor.Services;
 
 public class ApiRequestFactory
 {
-  private readonly AuthStateService
-      _authState;
+    private readonly AuthStateService
+        _authState;
 
 
-  public ApiRequestFactory(
-      AuthStateService authState)
-  {
-    _authState =
-        authState;
-  }
-
-
-  public HttpRequestMessage Create(
-      HttpMethod method,
-      string url,
-      HttpContent? content = null,
-      bool requiresAuthentication = false)
-  {
-    HttpRequestMessage request =
-        new(
-            method,
-            url);
-
-
-    if (content is not null)
+    public ApiRequestFactory(
+        AuthStateService authState)
     {
-      request.Content =
-          content;
+        _authState =
+            authState;
     }
 
 
-    if (requiresAuthentication &&
-        !string.IsNullOrWhiteSpace(
-            _authState.Token))
+    public HttpRequestMessage Create(
+        HttpMethod method,
+        string url,
+        HttpContent? content = null,
+        bool requiresAuthentication = false)
     {
-      request.Headers.Authorization =
-          new AuthenticationHeaderValue(
-              "Bearer",
-              _authState.Token);
+        HttpRequestMessage request =
+            new(
+                method,
+                url);
+
+
+        if (content is not null)
+        {
+            request.Content =
+                content;
+        }
+
+
+        if (requiresAuthentication &&
+            !string.IsNullOrWhiteSpace(
+                _authState.Token))
+        {
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    _authState.Token);
+        }
+
+
+        return request;
     }
-
-
-    return request;
-  }
 }

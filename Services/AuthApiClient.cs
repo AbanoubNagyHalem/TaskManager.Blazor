@@ -6,63 +6,63 @@ namespace TaskManager.Blazor.Services;
 
 public class AuthApiClient
 {
-  private readonly IHttpClientFactory
-      _httpClientFactory;
+    private readonly IHttpClientFactory
+        _httpClientFactory;
 
 
-  public AuthApiClient(
-      IHttpClientFactory httpClientFactory)
-  {
-    _httpClientFactory =
-        httpClientFactory;
-  }
-
-
-  public async Task<AuthResponse?> LoginAsync(
-      LoginRequest request,
-      CancellationToken cancellationToken = default)
-  {
-    HttpClient httpClient =
-        _httpClientFactory.CreateClient(
-            "TaskManagerApi");
-
-
-    HttpResponseMessage response =
-        await httpClient.PostAsJsonAsync(
-            "api/auth/login",
-            request,
-            cancellationToken);
-
-
-    if (response.StatusCode ==
-        HttpStatusCode.Unauthorized)
+    public AuthApiClient(
+        IHttpClientFactory httpClientFactory)
     {
-      return null;
+        _httpClientFactory =
+            httpClientFactory;
     }
 
 
-    response.EnsureSuccessStatusCode();
+    public async Task<AuthResponse?> LoginAsync(
+        LoginRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        HttpClient httpClient =
+            _httpClientFactory.CreateClient(
+                "TaskManagerApi");
 
 
-    return await response.Content
-        .ReadFromJsonAsync<AuthResponse>(
+        HttpResponseMessage response =
+            await httpClient.PostAsJsonAsync(
+                "api/auth/login",
+                request,
+                cancellationToken);
+
+
+        if (response.StatusCode ==
+            HttpStatusCode.Unauthorized)
+        {
+            return null;
+        }
+
+
+        response.EnsureSuccessStatusCode();
+
+
+        return await response.Content
+            .ReadFromJsonAsync<AuthResponse>(
+                cancellationToken);
+    }
+
+
+    public async Task<HttpResponseMessage>
+        RegisterAsync(
+            RegisterRequest request,
+            CancellationToken cancellationToken = default)
+    {
+        HttpClient httpClient =
+            _httpClientFactory.CreateClient(
+                "TaskManagerApi");
+
+
+        return await httpClient.PostAsJsonAsync(
+            "api/auth/register",
+            request,
             cancellationToken);
-  }
-
-
-  public async Task<HttpResponseMessage>
-      RegisterAsync(
-          RegisterRequest request,
-          CancellationToken cancellationToken = default)
-  {
-    HttpClient httpClient =
-        _httpClientFactory.CreateClient(
-            "TaskManagerApi");
-
-
-    return await httpClient.PostAsJsonAsync(
-        "api/auth/register",
-        request,
-        cancellationToken);
-  }
+    }
 }
