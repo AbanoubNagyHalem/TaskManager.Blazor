@@ -26,22 +26,15 @@
 
         <div class="d-flex gap-2">
 
-            <button
-                type="button"
-                class="btn btn-outline-secondary"
-                disabled="@(CurrentPage <= 1)"
-                @onclick="PreviousAsync">
+            <button type="button" class="btn btn-outline-secondary" disabled="@(CurrentPage <= 1)" @onclick="PreviousAsync">
 
                 Previous
 
             </button>
 
 
-            <button
-                type="button"
-                class="btn btn-outline-secondary"
-                disabled="@(CurrentPage >= TotalPages)"
-                @onclick="NextAsync">
+            <button type="button" class="btn btn-outline-secondary" disabled="@(CurrentPage >= TotalPages)"
+                    @onclick="NextAsync">
 
                 Next
 

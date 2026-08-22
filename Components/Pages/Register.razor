@@ -37,9 +37,7 @@
                     }
 
 
-                    <EditForm
-                        Model="@model"
-                        OnValidSubmit="HandleRegisterAsync">
+                    <EditForm Model="@model" OnValidSubmit="HandleRegisterAsync">
 
                         <DataAnnotationsValidator />
 
@@ -51,14 +49,10 @@
                             </label>
 
 
-                            <InputText
-                                class="form-control"
-                                @bind-Value="model.Name"
-                                placeholder="Your name" />
+                            <InputText class="form-control" @bind-Value="model.Name" placeholder="Your name" />
 
 
-                            <ValidationMessage
-                                For="@(() => model.Name)" />
+                            <ValidationMessage For="@(() => model.Name)" />
 
                         </div>
 
@@ -70,14 +64,10 @@
                             </label>
 
 
-                            <InputText
-                                class="form-control"
-                                @bind-Value="model.Email"
-                                placeholder="you@example.com" />
+                            <InputText class="form-control" @bind-Value="model.Email" placeholder="you@example.com" />
 
 
-                            <ValidationMessage
-                                For="@(() => model.Email)" />
+                            <ValidationMessage For="@(() => model.Email)" />
 
                         </div>
 
@@ -89,28 +79,20 @@
                             </label>
 
 
-                            <InputText
-                                type="password"
-                                class="form-control"
-                                @bind-Value="model.Password"
-                                placeholder="At least 6 characters" />
+                            <InputText type="password" class="form-control" @bind-Value="model.Password"
+                                       placeholder="At least 6 characters" />
 
 
-                            <ValidationMessage
-                                For="@(() => model.Password)" />
+                            <ValidationMessage For="@(() => model.Password)" />
 
                         </div>
 
 
-                        <button
-                            type="submit"
-                            class="btn btn-dark w-100"
-                            disabled="@isSubmitting">
+                        <button type="submit" class="btn btn-dark w-100" disabled="@isSubmitting">
 
                             @if (isSubmitting)
                             {
-                                <span
-                                    class="spinner-border spinner-border-sm me-2">
+                                <span class="spinner-border spinner-border-sm me-2">
                                 </span>
 
                                 <span>

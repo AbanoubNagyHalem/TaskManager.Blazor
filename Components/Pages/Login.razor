@@ -36,9 +36,7 @@
                     }
 
 
-                    <EditForm
-                        Model="@model"
-                        OnValidSubmit="HandleLoginAsync">
+                    <EditForm Model="@model" OnValidSubmit="HandleLoginAsync">
 
                         <DataAnnotationsValidator />
 
@@ -50,14 +48,10 @@
                             </label>
 
 
-                            <InputText
-                                class="form-control"
-                                @bind-Value="model.Email"
-                                placeholder="you@example.com" />
+                            <InputText class="form-control" @bind-Value="model.Email" placeholder="you@example.com" />
 
 
-                            <ValidationMessage
-                                For="@(() => model.Email)" />
+                            <ValidationMessage For="@(() => model.Email)" />
 
                         </div>
 
@@ -69,28 +63,20 @@
                             </label>
 
 
-                            <InputText
-                                type="password"
-                                class="form-control"
-                                @bind-Value="model.Password"
-                                placeholder="Enter your password" />
+                            <InputText type="password" class="form-control" @bind-Value="model.Password"
+                                       placeholder="Enter your password" />
 
 
-                            <ValidationMessage
-                                For="@(() => model.Password)" />
+                            <ValidationMessage For="@(() => model.Password)" />
 
                         </div>
 
 
-                        <button
-                            type="submit"
-                            class="btn btn-dark w-100"
-                            disabled="@isSubmitting">
+                        <button type="submit" class="btn btn-dark w-100" disabled="@isSubmitting">
 
                             @if (isSubmitting)
                             {
-                                <span
-                                    class="spinner-border spinner-border-sm me-2">
+                                <span class="spinner-border spinner-border-sm me-2">
                                 </span>
 
                                 <span>

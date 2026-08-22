@@ -25,9 +25,7 @@
         </div>
 
 
-        <a
-            href="/tasks/create"
-            class="btn btn-dark">
+        <a href="/tasks/create" class="btn btn-dark">
 
             + Add Task
 
@@ -36,18 +34,10 @@
     </div>
 
 
-    <TaskFilters
-        Search="@query.Search"
-        SearchChanged="OnSearchChanged"
-        Status="@query.Status"
-        StatusChanged="OnStatusChanged"
-        Priority="@query.Priority"
-        PriorityChanged="OnPriorityChanged"
-        SortBy="@query.SortBy"
-        SortByChanged="OnSortByChanged"
-        SortDirection="@query.SortDirection"
-        SortDirectionChanged="OnSortDirectionChanged"
-        OnApply="ApplyFiltersAsync" />
+    <TaskFilters Search="@query.Search" SearchChanged="OnSearchChanged" Status="@query.Status"
+                 StatusChanged="OnStatusChanged" Priority="@query.Priority" PriorityChanged="OnPriorityChanged"
+                 SortBy="@query.SortBy" SortByChanged="OnSortByChanged" SortDirection="@query.SortDirection"
+                 SortDirectionChanged="OnSortDirectionChanged" OnApply="ApplyFiltersAsync" />
 
 
     <ErrorState Message="@errorMessage" />
@@ -55,15 +45,11 @@
 
     @if (isLoading)
     {
-        <LoadingState
-            Message="Loading tasks..." />
+        <LoadingState Message="Loading tasks..." />
     }
     else if (tasks.Count == 0)
     {
-        <EmptyState
-            Icon="✅"
-            Title="No tasks found"
-            Message="Create a task or change your filters." />
+        <EmptyState Icon="✅" Title="No tasks found" Message="Create a task or change your filters." />
     }
     else
     {
@@ -75,14 +61,8 @@
             {
                 <div class="col-md-6 col-xl-4">
 
-                    <TaskCard
-                        Id="@task.Id"
-                        Title="@task.Title"
-                        Description="@task.Description"
-                        DueDate="@task.DueDate"
-                        Priority="@task.Priority"
-                        Status="@task.Status"
-                        OnDelete="DeleteTaskAsync" />
+                    <TaskCard Id="@task.Id" Title="@task.Title" Description="@task.Description" DueDate="@task.DueDate"
+                              Priority="@task.Priority" Status="@task.Status" OnDelete="DeleteTaskAsync" />
 
                 </div>
             }
@@ -90,12 +70,8 @@
         </div>
 
 
-        <TaskPagination
-            CurrentPage="@query.Page"
-            TotalPages="@totalPages"
-            TotalCount="@totalCount"
-            OnPrevious="PreviousPageAsync"
-            OnNext="NextPageAsync" />
+        <TaskPagination CurrentPage="@query.Page" TotalPages="@totalPages" TotalCount="@totalCount"
+                        OnPrevious="PreviousPageAsync" OnNext="NextPageAsync" />
     }
 
 </div>

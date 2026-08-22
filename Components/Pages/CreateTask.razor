@@ -40,8 +40,7 @@
 
             @if (isLoading)
             {
-                <LoadingState
-                    Message="Loading form..." />
+                <LoadingState Message="Loading form..." />
             }
             else
             {
@@ -49,9 +48,7 @@
 
                     <div class="card-body p-4">
 
-                        <EditForm
-                            Model="@model"
-                            OnValidSubmit="HandleCreateAsync">
+                        <EditForm Model="@model" OnValidSubmit="HandleCreateAsync">
 
                             <DataAnnotationsValidator />
 
@@ -65,13 +62,10 @@
                                 </label>
 
 
-                                <InputText
-                                    class="form-control"
-                                    @bind-Value="model.Title" />
+                                <InputText class="form-control" @bind-Value="model.Title" />
 
 
-                                <ValidationMessage
-                                    For="@(() => model.Title)" />
+                                <ValidationMessage For="@(() => model.Title)" />
 
                             </div>
 
@@ -83,14 +77,10 @@
                                 </label>
 
 
-                                <InputTextArea
-                                    class="form-control"
-                                    rows="5"
-                                    @bind-Value="model.Description" />
+                                <InputTextArea class="form-control" rows="5" @bind-Value="model.Description" />
 
 
-                                <ValidationMessage
-                                    For="@(() => model.Description)" />
+                                <ValidationMessage For="@(() => model.Description)" />
 
                             </div>
 
@@ -102,9 +92,7 @@
                                 </label>
 
 
-                                <InputDate
-                                    class="form-control"
-                                    @bind-Value="model.DueDate" />
+                                <InputDate class="form-control" @bind-Value="model.DueDate" />
 
                             </div>
 
@@ -116,9 +104,7 @@
                                 </label>
 
 
-                                <InputSelect
-                                    class="form-select"
-                                    @bind-Value="model.Priority">
+                                <InputSelect class="form-select" @bind-Value="model.Priority">
 
                                     <option value="@TaskPriority.Low">
                                         Low
@@ -139,15 +125,11 @@
 
                             <div class="d-flex gap-2">
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-dark"
-                                    disabled="@isSubmitting">
+                                <button type="submit" class="btn btn-dark" disabled="@isSubmitting">
 
                                     @if (isSubmitting)
                                     {
-                                        <span
-                                            class="spinner-border spinner-border-sm me-2">
+                                        <span class="spinner-border spinner-border-sm me-2">
                                         </span>
 
                                         <span>
@@ -164,11 +146,8 @@
                                 </button>
 
 
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-secondary"
-                                    disabled="@isSubmitting"
-                                    @onclick="GoBack">
+                                <button type="button" class="btn btn-outline-secondary" disabled="@isSubmitting"
+                                        @onclick="GoBack">
 
                                     Cancel
 
